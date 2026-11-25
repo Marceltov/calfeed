@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/build-app.sh build
+      - name: Version in the bundle matches VERSION
+        run: test "$(build/CalFeed.app/Contents/MacOS/CalFeed --version)" = "CalFeed $(cat VERSION)"
+      - run: codesign --verify --verbose build/CalFeed.app
